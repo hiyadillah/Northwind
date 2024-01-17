@@ -13,7 +13,7 @@ namespace Day06.Repository
 {
     internal class SupplierRepository : RepositoryBase<Supplier>
     {
-        public SupplierRepository(AdoDbContext _adoDbContext, DapperDbContext dapperDbContext) : base(_adoDbContext, dapperDbContext)
+        public SupplierRepository(DapperDbContext dapperDbContext) : base(dapperDbContext)
         {
         }
 
@@ -40,15 +40,12 @@ namespace Day06.Repository
 
             //delete
             _dapperDbContext.ExecuteNonQuery(sqlCommandModel);
-            //_adoDbContext.ExecuteNonQuery(sqlCommandModel);
         }
 
         public override IEnumerable<Supplier> FindAll()
         {
             SqlCommandModel sqlCommandModel = new SqlCommandModel() { CommandText = "select * from Suppliers" };
             IEnumerator<Supplier> dataset = _dapperDbContext.ExecuteReader<Supplier>(sqlCommandModel.CommandText);
-            _adoDbContext.Dispose();
-
             // loop and do yield
             while (dataset.MoveNext())
             {
@@ -66,13 +63,11 @@ namespace Day06.Repository
             };
             var dataset = _dapperDbContext
                 .ExecuteReader<Supplier>(sqlCommandModel);
-            _dapperDbContext.Dispose();
 
             while (dataset.MoveNext())
             {
-                yield return (Supplier)dataset.Current;
+                yield return dataset.Current;
             }
-            yield return (Supplier)dataset.Current;
         }
 
         public override void Save(Supplier entity)
